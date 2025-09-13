@@ -2,7 +2,7 @@
 
 describe('Sign In page', () => {
   beforeEach(() => {
-    cy.visit('login');
+    cy.visit('/login');
   });
 
   it('should allow log in with valid creds', () => {
@@ -12,25 +12,42 @@ describe('Sign In page', () => {
     cy.get('#password')
       .type('SuperSecretPassword!');
 
-    cy.get('.fa')
+    cy.get('[class="fa fa-2x fa-sign-in"]')
       .click();
 
-    cy.get('#flash')
-      .should('contain.text', 'You logged into a secure area!');
+    cy.url()
+      .should('include', '/secure');
+
+    cy.get('[class="flash success"]')
+      .should('contain', 'You logged into a secure area!');
   });
 
-  it('should not allow log in with invalid creds', () => {
+  it('should not allow log in with invalid username', () => {
     cy.get('#username')
       .type('user123');
 
     cy.get('#password')
-      .type('passworduser123');
+      .type('SuperSecretPassword!');
 
-    cy.get('.fa')
+    cy.get('[class="fa fa-2x fa-sign-in"]')
       .click();
 
-    cy.get('#flash')
-      .should('contain.text', 'Your username is invalid!');
+    cy.get('[class="flash error"]')
+      .should('contain', 'Your username is invalid!');
+  });
+
+  it('should not allow log in with invalid password', () => {
+    cy.get('#username')
+      .type('tomsmith');
+
+    cy.get('#password')
+      .type('passworduser123');
+
+    cy.get('[class="fa fa-2x fa-sign-in"]')
+      .click();
+
+    cy.get('[class="flash error"]')
+      .should('contain', 'Your password is invalid!');
   });
 
   it('should allow log out from the app', () => {
@@ -40,13 +57,16 @@ describe('Sign In page', () => {
     cy.get('#password')
       .type('SuperSecretPassword!');
 
-    cy.get('.fa')
+    cy.get('[class="fa fa-2x fa-sign-in"]')
       .click();
 
-    cy.get('.button')
+    cy.get('[class="icon-2x icon-signout"]')
       .click();
 
-    cy.get('#flash')
-      .should('contain.text', 'You logged out of the secure area!');
+    cy.get('[class="flash success"]')
+      .should('contain', 'You logged out of the secure area!');
+
+    cy.url()
+      .should('include', '/login');
   });
 });
